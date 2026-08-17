@@ -93,14 +93,3 @@ Nunca inclua arquivos `.env` reais, chaves privadas, tokens, senhas ou certifica
    ```text
    /refactor-arch
    ```
-
-5. Revise o relatório da Fase 2 e aprove a Fase 3 somente quando estiver de acordo com as alterações planejadas.
-
-## Critérios atendidos
-
-- Detecção de stack para os três projetos.
-- Relatórios com achados classificados por severidade e linhas exatas.
-- Pelo menos cinco achados por projeto, incluindo CRITICAL ou HIGH.
-- Skill com pausa obrigatória antes da modificação.
-- Material de referência para análise, auditoria, relatório, MVC e refatoração.
-- Proteções contra envio acidental de segredos ao Git.
