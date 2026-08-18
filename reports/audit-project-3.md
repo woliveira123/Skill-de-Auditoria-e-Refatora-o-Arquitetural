@@ -33,3 +33,4 @@ Recommendation: catch expected DB errors and centralize error responses.
 ## Validação da Fase 3
 
 Ambiente criado com `requirements.txt`. O cliente de teste Flask confirmou respostas HTTP 200 para `/`, `/health`, `/tasks`, `/users`, `/reports/summary` e `/categories`.
+O CRUD de tarefas (POST, GET, PUT e DELETE) também foi exercitado com sucesso.

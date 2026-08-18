@@ -34,3 +34,4 @@ Recommendation: validate a named checkout DTO.
 ## Validação da Fase 3
 
 Dependências instaladas com `npm ci`. A aplicação iniciou com `node src/app.js` e `GET /api/admin/financial-report` respondeu HTTP 200.
+O fluxo `POST /api/checkout` também foi validado com HTTP 200 e retorno de `enrollment_id`.
