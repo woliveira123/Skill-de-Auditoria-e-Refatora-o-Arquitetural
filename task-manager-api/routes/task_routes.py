@@ -3,10 +3,12 @@ from database import db
 from models.task import Task
 from models.user import User
 from models.category import Category
+from controllers.task_controller import TaskController
 from datetime import datetime
 import json, os, sys, time
 
 task_bp = Blueprint('tasks', __name__)
+task_controller = TaskController()
 
 @task_bp.route('/tasks', methods=['GET'])
 def get_tasks():
@@ -144,8 +146,11 @@ def create_task():
             task.tags = tags
 
     try:
-        db.session.add(task)
-        db.session.commit()
+        task = task_controller.create({
+            'title': task.title, 'description': task.description, 'status': task.status,
+            'priority': task.priority, 'user_id': task.user_id, 'category_id': task.category_id,
+            'due_date': task.due_date, 'tags': task.tags
+        })
         print(f"Task criada: {task.id} - {task.title}")
         return jsonify(task.to_dict()), 201
     except Exception as e:
@@ -215,7 +220,7 @@ def update_task(task_id):
     task.updated_at = datetime.utcnow()
 
     try:
-        db.session.commit()
+        task_controller.update(task, {})
         print(f"Task atualizada: {task.id}")
         return jsonify(task.to_dict()), 200
     except Exception as e:
@@ -229,8 +234,7 @@ def delete_task(task_id):
         return jsonify({'error': 'Task não encontrada'}), 404
 
     try:
-        db.session.delete(task)
-        db.session.commit()
+        task_controller.delete(task)
         print(f"Task deletada: {task_id}")
         return jsonify({'message': 'Task deletada com sucesso'}), 200
     except:
