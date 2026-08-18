@@ -29,3 +29,7 @@ Recommendation: aggregate tasks by user in one query.
 ### [LOW] Broad bare exception handlers
 File: `task-manager-api/routes/report_routes.py:182-188`  
 Recommendation: catch expected DB errors and centralize error responses.
+
+## Validação da Fase 3
+
+Ambiente criado com `requirements.txt`. O cliente de teste Flask confirmou respostas HTTP 200 para `/`, `/health`, `/tasks`, `/users`, `/reports/summary` e `/categories`.

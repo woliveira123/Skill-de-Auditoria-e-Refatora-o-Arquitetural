@@ -35,3 +35,7 @@ Recommendation: use environment-based configuration with production-safe default
 ### [LOW] Sensitive operational details logged and returned
 File: `code-smells-project/controllers.py:208-210`  
 Recommendation: use structured, redacted logging.
+
+## Validação da Fase 3
+
+Ambiente criado com `requirements.txt`. O cliente de teste Flask confirmou respostas HTTP 200 para `/`, `/health`, `/produtos`, `/usuarios`, `/pedidos` e `/relatorios/vendas`.

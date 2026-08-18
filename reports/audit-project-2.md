@@ -30,3 +30,7 @@ Recommendation: enforce foreign keys and transactional delete policy.
 ### [LOW] Ambiguous request field names
 File: `ecommerce-api-legacy/src/AppManager.js:22-26`  
 Recommendation: validate a named checkout DTO.
+
+## Validação da Fase 3
+
+Dependências instaladas com `npm ci`. A aplicação iniciou com `node src/app.js` e `GET /api/admin/financial-report` respondeu HTTP 200.
