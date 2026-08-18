@@ -1,5 +1,6 @@
 from database import get_db
 import sqlite3
+from werkzeug.security import check_password_hash, generate_password_hash
 
 def get_todos_produtos():
     db = get_db()
@@ -97,9 +98,9 @@ def login_usuario(email, senha):
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute("SELECT * FROM usuarios WHERE email = ? AND senha = ?", (email, senha))
+    cursor.execute("SELECT * FROM usuarios WHERE email = ?", (email,))
     row = cursor.fetchone()
-    if row:
+    if row and check_password_hash(row["senha"], senha):
         return {
             "id": row["id"],
             "nome": row["nome"],
@@ -112,7 +113,7 @@ def criar_usuario(nome, email, senha, tipo="cliente"):
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute("INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, ?)", (nome, email, senha, tipo))
+    cursor.execute("INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, ?)", (nome, email, generate_password_hash(senha), tipo))
     db.commit()
     return cursor.lastrowid
 
