@@ -25,7 +25,7 @@ def get_produto_por_id(id):
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute("SELECT * FROM produtos WHERE id = " + str(id))
+    cursor.execute("SELECT * FROM produtos WHERE id = ?", (id,))
     row = cursor.fetchone()
     if row:
         return {
@@ -44,28 +44,21 @@ def criar_produto(nome, descricao, preco, estoque, categoria):
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute(
-        "INSERT INTO produtos (nome, descricao, preco, estoque, categoria) VALUES ('" +
-        nome + "', '" + descricao + "', " + str(preco) + ", " + str(estoque) + ", '" + categoria + "')"
-    )
+    cursor.execute("INSERT INTO produtos (nome, descricao, preco, estoque, categoria) VALUES (?, ?, ?, ?, ?)", (nome, descricao, preco, estoque, categoria))
     db.commit()
     return cursor.lastrowid
 
 def atualizar_produto(id, nome, descricao, preco, estoque, categoria):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute(
-        "UPDATE produtos SET nome = '" + nome + "', descricao = '" + descricao +
-        "', preco = " + str(preco) + ", estoque = " + str(estoque) +
-        ", categoria = '" + categoria + "' WHERE id = " + str(id)
-    )
+    cursor.execute("UPDATE produtos SET nome=?, descricao=?, preco=?, estoque=?, categoria=? WHERE id=?", (nome, descricao, preco, estoque, categoria, id))
     db.commit()
     return True
 
 def deletar_produto(id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("DELETE FROM produtos WHERE id = " + str(id))
+    cursor.execute("DELETE FROM produtos WHERE id = ?", (id,))
     db.commit()
     return True
 
@@ -80,7 +73,6 @@ def get_todos_usuarios():
             "id": row["id"],
             "nome": row["nome"],
             "email": row["email"],
-            "senha": row["senha"],
             "tipo": row["tipo"],
             "criado_em": row["criado_em"]
         })
@@ -89,14 +81,13 @@ def get_todos_usuarios():
 def get_usuario_por_id(id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM usuarios WHERE id = " + str(id))
+    cursor.execute("SELECT * FROM usuarios WHERE id = ?", (id,))
     row = cursor.fetchone()
     if row:
         return {
             "id": row["id"],
             "nome": row["nome"],
             "email": row["email"],
-            "senha": row["senha"],
             "tipo": row["tipo"],
             "criado_em": row["criado_em"]
         }
@@ -106,9 +97,7 @@ def login_usuario(email, senha):
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute(
-        "SELECT * FROM usuarios WHERE email = '" + email + "' AND senha = '" + senha + "'"
-    )
+    cursor.execute("SELECT * FROM usuarios WHERE email = ? AND senha = ?", (email, senha))
     row = cursor.fetchone()
     if row:
         return {
@@ -123,10 +112,7 @@ def criar_usuario(nome, email, senha, tipo="cliente"):
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute(
-        "INSERT INTO usuarios (nome, email, senha, tipo) VALUES ('" +
-        nome + "', '" + email + "', '" + senha + "', '" + tipo + "')"
-    )
+    cursor.execute("INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, ?)", (nome, email, senha, tipo))
     db.commit()
     return cursor.lastrowid
 
@@ -137,7 +123,7 @@ def criar_pedido(usuario_id, itens):
     total = 0
 
     for item in itens:
-        cursor.execute("SELECT * FROM produtos WHERE id = " + str(item["produto_id"]))
+        cursor.execute("SELECT * FROM produtos WHERE id = ?", (item["produto_id"],))
         produto = cursor.fetchone()
         if produto is None:
             return {"erro": "Produto " + str(item["produto_id"]) + " não encontrado"}
@@ -145,25 +131,15 @@ def criar_pedido(usuario_id, itens):
             return {"erro": "Estoque insuficiente para " + produto["nome"]}
         total = total + (produto["preco"] * item["quantidade"])
 
-    cursor.execute(
-        "INSERT INTO pedidos (usuario_id, status, total) VALUES (" +
-        str(usuario_id) + ", 'pendente', " + str(total) + ")"
-    )
+    cursor.execute("INSERT INTO pedidos (usuario_id, status, total) VALUES (?, 'pendente', ?)", (usuario_id, total))
     pedido_id = cursor.lastrowid
 
     for item in itens:
-        cursor.execute("SELECT preco FROM produtos WHERE id = " + str(item["produto_id"]))
+        cursor.execute("SELECT preco FROM produtos WHERE id = ?", (item["produto_id"],))
         produto = cursor.fetchone()
-        cursor.execute(
-            "INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, preco_unitario) VALUES (" +
-            str(pedido_id) + ", " + str(item["produto_id"]) + ", " +
-            str(item["quantidade"]) + ", " + str(produto["preco"]) + ")"
-        )
+        cursor.execute("INSERT INTO itens_pedido (pedido_id, produto_id, quantidade, preco_unitario) VALUES (?, ?, ?, ?)", (pedido_id, item["produto_id"], item["quantidade"], produto["preco"]))
 
-        cursor.execute(
-            "UPDATE produtos SET estoque = estoque - " + str(item["quantidade"]) +
-            " WHERE id = " + str(item["produto_id"])
-        )
+        cursor.execute("UPDATE produtos SET estoque = estoque - ? WHERE id = ?", (item["quantidade"], item["produto_id"]))
 
     db.commit()
     return {"pedido_id": pedido_id, "total": total}
@@ -171,7 +147,7 @@ def criar_pedido(usuario_id, itens):
 def get_pedidos_usuario(usuario_id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT * FROM pedidos WHERE usuario_id = " + str(usuario_id))
+    cursor.execute("SELECT * FROM pedidos WHERE usuario_id = ?", (usuario_id,))
     rows = cursor.fetchall()
     result = []
     for row in rows:
@@ -276,9 +252,7 @@ def atualizar_status_pedido(pedido_id, novo_status):
     db = get_db()
     cursor = db.cursor()
 
-    cursor.execute(
-        "UPDATE pedidos SET status = '" + novo_status + "' WHERE id = " + str(pedido_id)
-    )
+    cursor.execute("UPDATE pedidos SET status = ? WHERE id = ?", (novo_status, pedido_id))
     db.commit()
     return True
 
@@ -287,16 +261,21 @@ def buscar_produtos(termo, categoria=None, preco_min=None, preco_max=None):
     cursor = db.cursor()
 
     query = "SELECT * FROM produtos WHERE 1=1"
+    params = []
     if termo:
-        query += " AND (nome LIKE '%" + termo + "%' OR descricao LIKE '%" + termo + "%')"
+        query += " AND (nome LIKE ? OR descricao LIKE ?)"
+        params.extend([f"%{termo}%", f"%{termo}%"])
     if categoria:
-        query += " AND categoria = '" + categoria + "'"
+        query += " AND categoria = ?"
+        params.append(categoria)
     if preco_min:
-        query += " AND preco >= " + str(preco_min)
+        query += " AND preco >= ?"
+        params.append(preco_min)
     if preco_max:
-        query += " AND preco <= " + str(preco_max)
+        query += " AND preco <= ?"
+        params.append(preco_max)
 
-    cursor.execute(query)
+    cursor.execute(query, params)
     rows = cursor.fetchall()
     result = []
     for row in rows:
